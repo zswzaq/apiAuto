@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!--<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="testCase">
+        <classes>
+            <class name="base.test.TestAllCase"/>
+            &lt;!&ndash;<methods>
+                <include name="test"/>
+            </methods>&ndash;&gt;
+        </classes>
+    </test>
+</suite>-->
+
+<suite name="All Test Suite">
+<test verbose="2" preserve-order="true" name="testCase">
+    <classes>
+        <class name="base.test.TestAllCase"/>
+    </classes>
+</test>
+</suite>
