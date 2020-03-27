@@ -22,9 +22,9 @@ public class TestAllCase02 {
     @DataProvider
     public Object[][] getData() {
         //测试用例详情列表
-        ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase02.xlsx", 0, ApiCaseDetail.class);
+        ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase03.xlsx", 0, ApiCaseDetail.class);
         //接口基本信息列表
-        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase02.xlsx", 1, ApiInfo.class);
+        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase03.xlsx", 1, ApiInfo.class);
         //每个用例对应一条接口基本信息，接口信息相当与测试用例的一个属性
         //创建一个二维数组，长度是测试用例详情数据的行数
         Object[][] datas = new Object[detailList.size()][];
@@ -75,12 +75,12 @@ public class TestAllCase02 {
 
     public static void main(String[] args) {
         //详情
-        ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase02.xlsx", 0, ApiCaseDetail.class);
+        /*ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase02.xlsx", 0, ApiCaseDetail.class);
         for (Object object : detailList) {
             System.out.println(object);
-        }
-        //
-        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase02.xlsx", 1, ApiInfo.class);
+        }*/
+        //api信息
+        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase03.xlsx", 1, ApiInfo.class);
         for (Object o : infoList) {
             System.out.println(o);
         }

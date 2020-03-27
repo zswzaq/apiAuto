@@ -2,11 +2,14 @@ package base.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author ZS
  * @Description:
  * @date 2020/3/27 00:31
  */
+
 
 @Data
 public class ApiInfo {
@@ -15,6 +18,8 @@ public class ApiInfo {
     private String apiName;
     private String Type;
 
+    private String headers;
+
     @Override
     public String toString() {
         return "ApiInfo{" +
@@ -22,6 +27,7 @@ public class ApiInfo {
                 ", url='" + url + '\'' +
                 ", apiName='" + apiName + '\'' +
                 ", Type='" + Type + '\'' +
+                ", headers=" + headers +
                 '}';
     }
 }

@@ -2,6 +2,7 @@ package base.uitls;
 
 
 import base.pojo.ApiCaseDetail;
+import base.pojo.Header;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -99,6 +100,38 @@ public class HttpUtils {
         return null;
     }
 
+    /**
+     * @param apiCaseDetail 参数：用例详情
+     * @return
+     */
+    public static String doPost(ApiCaseDetail apiCaseDetail) {
+        String responseEntity = null;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(apiCaseDetail.getApiInfo().getUrl());
+        String headers = apiCaseDetail.getApiInfo().getHeaders();//得到所有的headers
+        List<Header> headerList = JSONObject.parseArray(headers, Header.class);//将其转化为list
+
+        //设置必须的请求头
+        for (Header header : headerList) {
+            post.setHeader(header.getKey(), header.getValue());
+        }
+        StringEntity stringEntity = new StringEntity(apiCaseDetail.getRequestData(), ContentType.APPLICATION_JSON);
+        stringEntity.setContentEncoding("utf-8");
+        //设置请求体
+        post.setEntity(stringEntity);
+        try {
+            //发包
+            CloseableHttpResponse response = httpClient.execute(post);
+            StatusLine statusLine = response.getStatusLine();
+            // 3.获取响应体
+            HttpEntity entity = response.getEntity();
+            responseEntity = EntityUtils.toString(entity);// 工具包toString，将响应体转化为字符串
+            return responseEntity;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * @Param: requestData:json格式的数据
@@ -135,16 +168,35 @@ public class HttpUtils {
      * @param apiCaseDetail 参数：用例详情
      * @return
      */
-    public static String doPost(ApiCaseDetail apiCaseDetail) {
-        return doPost(apiCaseDetail.getApiInfo().getUrl(), apiCaseDetail.getRequestData());
-    }
-
-    /**
-     * @param apiCaseDetail 参数：用例详情
-     * @return
-     */
     public static String doGet(ApiCaseDetail apiCaseDetail) {
-        return doPost(apiCaseDetail.getApiInfo().getUrl(), apiCaseDetail.getRequestData());
+        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+        //把json参数转化为map队象
+        Map<String, Object> jsonMap = JSONObject.parseObject(apiCaseDetail.getRequestData());
+        Set<String> keySet = jsonMap.keySet();
+        for (String key : keySet) {
+            String name = key;
+            String value = jsonMap.get(key).toString();
+            BasicNameValuePair basicNameValuePair = new BasicNameValuePair(name, value);
+            parameters.add(basicNameValuePair);
+        }
+        String s = URLEncodedUtils.format(parameters, "utf-8");
+        HttpGet get = new HttpGet(apiCaseDetail.getApiInfo().getUrl() + "?" + s);
+        //设置必须的请求头
+        String headers = apiCaseDetail.getApiInfo().getHeaders();//得到所有的headers
+        List<Header> headerList = JSONObject.parseArray(headers, Header.class);//将其转化为list
+        for (Header header : headerList) {
+            get.setHeader(header.getKey(), header.getValue());
+        }
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        try {
+            CloseableHttpResponse response = httpClient.execute(get);
+            HttpEntity entity = response.getEntity();
+            String string = EntityUtils.toString(entity);// 工具包toString，将响应体转化为字符串
+            return string;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -154,13 +206,14 @@ public class HttpUtils {
      */
     public static String doGet(String url, String requestData) {
         List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-        //把json参数转化为map队象
+        //把json参数转化为map对象
         Map<String, Object> jsonMap = JSONObject.parseObject(requestData);
         Set<String> keySet = jsonMap.keySet();
-        for (String key : keySet) {
-            String username = key;
-            String password = jsonMap.get(key).toString();
-            BasicNameValuePair basicNameValuePair = new BasicNameValuePair(username, password);
+        for (String key : keySet) {//遍历keySet，生成一个名值对
+            String name = key;
+            String value = jsonMap.get(key).toString();
+            //生成，
+            BasicNameValuePair basicNameValuePair = new BasicNameValuePair(name, value);
             parameters.add(basicNameValuePair);
         }
         String s = URLEncodedUtils.format(parameters, "utf-8");
@@ -178,5 +231,13 @@ public class HttpUtils {
         }
         return null;
     }
+
+    /*public static String doPost(ApiCaseDetail apiCaseDetail) {
+        return doPost(apiCaseDetail.getApiInfo().getUrl(), apiCaseDetail.getRequestData());
+    }
+
+    public static String doGet(ApiCaseDetail apiCaseDetail) {
+        return doPost(apiCaseDetail.getApiInfo().getUrl(), apiCaseDetail.getRequestData());
+    }*/
 
 }
