@@ -3,6 +3,11 @@ package base.test;
 import base.pojo.RegisterData;
 import base.uitls.ExcelUtils;
 import base.uitls.HttpUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -81,6 +86,20 @@ public class TestAllCase {
         String str = HttpUtils.doPost(URL, map);
         System.out.println(str);
     }*/
+    public static void main(String[] args) {
+        //用jsonPath解析json
+        String jsonStr = "{\"code\":2,\"msg\":\"账号已存在\",\"data\":null,\"copyright\":\"Copyright 柠檬班 © 2017-2019 湖南省零檬信息技术有限公司 All Rights Reserved\"}\n";
+        String jsonPath = "$.code";
+        Object parse = Configuration.defaultConfiguration().jsonProvider().parse(jsonStr);
+        Object read = JsonPath.read(parse, jsonPath);
+        //System.out.println(read);
+
+        //用fastJson的jsonPath解析json
+        JSONObject object = JSON.parseObject(jsonStr);
+        Object eval = JSONPath.eval(object, "$.msg");
+        Object read1 = JSONPath.read(jsonStr, "$.code");
+        System.out.println(read1);
+    }
 
 }
 

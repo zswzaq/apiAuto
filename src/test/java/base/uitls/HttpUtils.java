@@ -3,6 +3,7 @@ package base.uitls;
 
 import base.pojo.ApiCaseDetail;
 import base.pojo.Header;
+import base.pojo.RequestType;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -170,7 +171,7 @@ public class HttpUtils {
      */
     public static String doGet(ApiCaseDetail apiCaseDetail) {
         List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-        //把json参数转化为map队象
+        //把json参数转化为map对象
         Map<String, Object> jsonMap = JSONObject.parseObject(apiCaseDetail.getRequestData());
         Set<String> keySet = jsonMap.keySet();
         for (String key : keySet) {
@@ -229,6 +230,27 @@ public class HttpUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public static String action(ApiCaseDetail apiCaseDetail) {
+        //请求方法
+        String type = apiCaseDetail.getApiInfo().getType();
+        //请求分发
+        String str = null;
+        if (RequestType.GET.toString().equalsIgnoreCase(type)) {
+            //直接传测试用例
+            str = HttpUtils.doGet(apiCaseDetail);
+        } else if (RequestType.POST.toString().equalsIgnoreCase(type)) {
+            str = HttpUtils.doPost(apiCaseDetail);
+        } else if (RequestType.PATCH.toString().equalsIgnoreCase(type)) {
+            str = HttpUtils.doPatch(apiCaseDetail);
+        }
+        return str;
+    }
+
+    public static String doPatch(ApiCaseDetail apiCaseDetail) {
+        // TODO
         return null;
     }
 

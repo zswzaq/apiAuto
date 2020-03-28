@@ -13,7 +13,8 @@ public class ApiCaseDetail {
     private String caseId;
     private String apiId;
     private String requestData;
-    private  ApiInfo apiInfo;
+    private String exceptedInfo;
+    private ApiInfo apiInfo;
 
     @Override
     public String toString() {
@@ -21,6 +22,7 @@ public class ApiCaseDetail {
                 "caseId='" + caseId + '\'' +
                 ", apiId='" + apiId + '\'' +
                 ", requestData='" + requestData + '\'' +
+                ", exceptedInfo='" + exceptedInfo + '\'' +
                 ", apiInfo=" + apiInfo +
                 '}';
     }
