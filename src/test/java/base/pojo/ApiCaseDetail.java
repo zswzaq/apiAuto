@@ -9,21 +9,25 @@ import lombok.Data;
  */
 
 @Data
-public class ApiCaseDetail {
+public class ApiCaseDetail extends ExcelBase {
+    //private Integer rowNo;//行号
     private String caseId;
     private String apiId;
-    private String requestData;
-    private String exceptedInfo;
     private ApiInfo apiInfo;
+    private String requestData;//请求结果
+    private String exceptedInfo;//预期结果
+    private String actualRespond;//实际结果
 
     @Override
     public String toString() {
-        return "ApiCaseDetail{" +
+        return super.toString() + "ApiCaseDetail{" +
                 "caseId='" + caseId + '\'' +
                 ", apiId='" + apiId + '\'' +
+                ", apiInfo=" + apiInfo +
                 ", requestData='" + requestData + '\'' +
                 ", exceptedInfo='" + exceptedInfo + '\'' +
-                ", apiInfo=" + apiInfo +
-                '}';
+                ", actualRespond=" + actualRespond +
+                "} ";
     }
+
 }

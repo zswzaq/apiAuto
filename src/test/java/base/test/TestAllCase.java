@@ -8,9 +8,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -88,17 +93,44 @@ public class TestAllCase {
     }*/
     public static void main(String[] args) {
         //用jsonPath解析json
-        String jsonStr = "{\"code\":2,\"msg\":\"账号已存在\",\"data\":null,\"copyright\":\"Copyright 柠檬班 © 2017-2019 湖南省零檬信息技术有限公司 All Rights Reserved\"}\n";
+        /*String jsonStr = "{\"code\":2,\"msg\":\"账号已存在\",\"data\":null,\"copyright\":\"Copyright 柠檬班 © 2017-2019 湖南省零檬信息技术有限公司 All Rights Reserved\"}\n";
         String jsonPath = "$.code";
         Object parse = Configuration.defaultConfiguration().jsonProvider().parse(jsonStr);
         Object read = JsonPath.read(parse, jsonPath);
         //System.out.println(read);
-
         //用fastJson的jsonPath解析json
         JSONObject object = JSON.parseObject(jsonStr);
         Object eval = JSONPath.eval(object, "$.msg");
         Object read1 = JSONPath.read(jsonStr, "$.code");
-        System.out.println(read1);
+        System.out.println(read1);*/
+        writeExcel();
+    }
+    // 回写数据到excel中
+    private static void writeExcel() {
+        try {
+            InputStream inputStream = TestAllCase.class.getResourceAsStream("/case/testCase.xlsx");
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(0);//第一个表单
+            Row row = sheet.getRow(1);//第2行
+            Cell cell = row.getCell(1, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);//第1列
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue("你好啊");
+            FileOutputStream outputStream = new FileOutputStream("D:\\testStudy\\a.xlsx");
+            workbook.write(outputStream);
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (workbook != null) {
+                outputStream.close();
+            }
+            if (inputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
     }
 
 }

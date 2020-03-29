@@ -1,20 +1,32 @@
 package base.uitls;
 
-import base.pojo.RegisterData;
+import base.pojo.ApiInfo;
+import base.pojo.WriteData;
+import base.test.TestAllCase04;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ZS
- * @Description:
+ * @Description: excel读写类
  * @date 2020/3/25 12:27
  */
 public class ExcelUtils {
 
+    /** 读取excel的方法
+     * @param excelPath  Excel相对路径
+     * @param sheetIndex 表单索引
+     * @param clazz      要读的类的字节码
+     * @return
+     */
     public static ArrayList<Object> readExcel(String excelPath, int sheetIndex, Class clazz) {
         InputStream inputStream = null;
         try {
@@ -51,6 +63,13 @@ public class ExcelUtils {
             for (int i = 1; i <= lastRowNum; i++) {
                 // 创建一个用户对象来保存数据行的信息
                 Object object = clazz.newInstance();
+                //
+                //获取当前excel 的行号
+                int rowNo = i + 1;
+                String setRowNoMethod = "setRowNo";
+                Method method = clazz.getMethod(setRowNoMethod, Integer.class);
+                //通过反射设置行号
+                method.invoke(object, rowNo);
                 // 获得当前行
                 Row currentRow = sheet.getRow(i);
                 // 遍历当前数据行的每一列
@@ -90,8 +109,98 @@ public class ExcelUtils {
         return null;
     }
 
+    /**
+     * 回写数据到excel中
+     * @param sourceExcelPath 文件原路径
+     * @param targetExcelPath 文件写入路径
+     * @param sheetIndex      sheet表单所引
+     * @param writeData       写入的数据
+     */
+    public static void writeExcel(String sourceExcelPath, String targetExcelPath, int sheetIndex, WriteData writeData) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
+            Row row = sheet.getRow(writeData.getRowNo() - 1);//行号
+            Cell cell = row.getCell(writeData.getCellNo() - 1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);//列
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue(writeData.getData());
+            outputStream = new FileOutputStream(new File(targetExcelPath));
+            workbook.write(outputStream);
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (workbook != null) {
+                outputStream.close();
+            }
+            if (inputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param sourceExcelPath 文件原路径
+     * @param targetExcelPath 文件写入路径
+     * @param sheetIndex      sheet表单所引
+     */
+    public static void batchWriteExcel(String sourceExcelPath, String targetExcelPath, int sheetIndex) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        Workbook workbook = null;
+        try {
+            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
+            //获取全局数据池的所有实际结果
+            List<WriteData> writeDataList = ApiUtils.getWriteDataList();
+            for (WriteData writeData : writeDataList) {
+                Row row = sheet.getRow(writeData.getRowNo() - 1);//行号
+                Cell cell = row.getCell(writeData.getCellNo() - 1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);//列
+                cell.setCellType(CellType.STRING);
+                cell.setCellValue(writeData.getData());
+                outputStream = new FileOutputStream(new File(targetExcelPath));
+                workbook.write(outputStream);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (workbook != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public static void main(String[] args) {
-        ArrayList<Object> dataList = readExcel("/case/register.xlsx", 0, RegisterData.class);
+        ArrayList<Object> dataList = readExcel("/case/testCase04.xlsx", 1, ApiInfo.class);
         for (Object obj : dataList) {
             System.out.println(obj);
         }

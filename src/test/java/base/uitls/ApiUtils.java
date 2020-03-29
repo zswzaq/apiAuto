@@ -2,9 +2,12 @@ package base.uitls;
 
 import base.pojo.ApiCaseDetail;
 import base.pojo.ApiInfo;
+import base.pojo.WriteData;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,12 +16,22 @@ import java.util.Map;
  * @date 2020/3/28 13:43
  */
 public class ApiUtils {
+    //全局数据池，提供get set方法
+    private static List<WriteData> writeDataList = new ArrayList<WriteData>();
+    //把每一个用例执行的实际结果，添加到数据池中
+    public static void setWriteDataList(WriteData writeData) {
+        writeDataList.add(writeData);
+    }
+    //获取数据池数据
+    public static List<WriteData> getWriteDataList() {
+        return writeDataList;
+    }
 
     public static Object[][] getData(){
         //测试用例详情列表
-        ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase03.xlsx", 0, ApiCaseDetail.class);
+        ArrayList<Object> detailList = ExcelUtils.readExcel("/case/testCase04.xlsx", 0, ApiCaseDetail.class);
         //接口基本信息列表
-        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase03.xlsx", 1, ApiInfo.class);
+        ArrayList<Object> infoList = ExcelUtils.readExcel("/case/testCase04.xlsx", 1, ApiInfo.class);
         //每个用例对应一条接口基本信息，接口信息相当与测试用例的一个属性
         //创建一个二维数组，长度是测试用例详情数据的行数
         Object[][] datas = new Object[detailList.size()][];
