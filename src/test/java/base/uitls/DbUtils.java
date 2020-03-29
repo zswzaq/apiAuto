@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * @author ZS
+ * @Description: jdbc工具类
+ * @date 2020/3/29 14:46
+ */
 public class DbUtils {
 
     private static String url;
