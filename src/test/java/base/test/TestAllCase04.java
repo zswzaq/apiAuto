@@ -1,29 +1,34 @@
 package base.test;
 
 import base.pojo.ApiCaseDetail;
-import base.pojo.ApiInfo;
 import base.pojo.WriteData;
-import base.uitls.ApiUtils;
-import base.uitls.AssertUtils;
-import base.uitls.ExcelUtils;
-import base.uitls.HttpUtils;
+import base.uitls.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * @author ZS
  * @Description: 测试类
- * @date 2020/3/26 23:22
+ * @date 2020/3/28 23:22
  */
 public class TestAllCase04 {
+
+    @BeforeSuite
+    public String beforeSuite() {
+        //数据初始化，得到随机的手机号
+        String tel = RdPersonUtils.getTel();
+        ParamUtils.addGlobalData("mobile_phone", tel);
+        ParamUtils.addGlobalData("pwd", "12345678");
+        return tel;
+    }
 
     @DataProvider
     public Object[][] getData() {
@@ -31,6 +36,42 @@ public class TestAllCase04 {
     }
 
     @Test(dataProvider = "getData")
+    public void test0331(ApiCaseDetail apiCaseDetail) {
+        //前置验证
+        SqlCheckUtils.beforeCheck(apiCaseDetail);
+        //发包，得到实际响应
+        String actualResult = HttpUtils.action(apiCaseDetail);
+
+        //实际结果数据
+        WriteData writeData = new WriteData(apiCaseDetail.getRowNo(), 5, actualResult);
+        //搜集实际结果，回写数据
+        ApiUtils.setWriteDataList(writeData);
+        //提取需要参数的数据
+        ApiUtils.tqRespData(apiCaseDetail,actualResult);
+        //后置验证
+        SqlCheckUtils.afterCheck(apiCaseDetail);
+        //断言实际结果与预计结果
+        AssertUtils.assertRespEntity(apiCaseDetail, actualResult);
+        System.out.println(actualResult);
+    }
+
+    /*@Test(dataProvider = "getData")
+    public void test0329(ApiCaseDetail apiCaseDetail) {
+        String actualResult = HttpUtils.action(apiCaseDetail);
+        //前置验证
+        SqlCheckUtils.beforeCheck(apiCaseDetail);
+        //实际结果数据
+        WriteData writeData = new WriteData(apiCaseDetail.getRowNo(), 5, actualResult);
+        //搜集实际结果
+        ApiUtils.setWriteDataList(writeData);
+        //前置验证
+        SqlCheckUtils.afterCheck(apiCaseDetail);
+        //断言实际结果与预计结果
+        AssertUtils.assertRespEntity(apiCaseDetail, actualResult);
+        System.out.println(actualResult);
+    }*/
+
+    /*@Test(dataProvider = "getData")
     public void test0328(ApiCaseDetail apiCaseDetail) {
         //String str = HttpUtils.action(apiCaseDetail);
         String actualResult = HttpUtils.action(apiCaseDetail);
@@ -47,12 +88,13 @@ public class TestAllCase04 {
         AssertUtils.assertRespEntity(apiCaseDetail, actualResult);
         System.out.println(actualResult);
 
-    }
+    }*/
 
     //执行完所有用例后，再写入所有的实际结果的数据
     @AfterSuite
-    public void afterSuite(){
+    public void afterSuite() {
         ExcelUtils.batchWriteExcel("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 0);
+        ExcelUtils.batchWriteSqlCheck("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 2);
 
     }
 

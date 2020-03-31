@@ -1,5 +1,6 @@
 package base.uitls;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -9,7 +10,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,12 +32,32 @@ public class DbUtils {
         init();
     }
 
+    public static void init() {
+        try {
+            // 1:从属性文件加载出数据库连接信息
+            Properties properties = new Properties();
+            InputStream inStream = DbUtils.class.getResourceAsStream("/config/jdbc.properties");
+            properties.load(inStream);
+            url = properties.getProperty("url");
+            user = properties.getProperty("username");
+            password = properties.getProperty("password");
+
+            // 2:装载MySQL驱动程序Driver，安装驱动管理器DriverManager
+            String driverName = properties.getProperty("driver");
+            Class.forName(driverName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 获得连接
      * @return
      * @throws SQLException
      */
-    private static Connection getConnection() {
+    public static Connection getConnection() {
         try {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
@@ -48,28 +69,10 @@ public class DbUtils {
     /**
      * 初始化方法：从属性文件加载出数据库连接信息、把驱动加载到jvm
      */
-    private static void init() {
-        try {
-            // 1:从属性文件加载出数据库连接信息
-            Properties properties = new Properties();
-            InputStream inStream = DbUtils.class.getResourceAsStream("/config/jdbc.properties");
-            properties.load(inStream);
-            url = properties.getProperty("jdbc.url");
-            user = properties.getProperty("jdbc.user");
-            password = properties.getProperty("jdbc.password");
 
-            // 2:装载MySQL驱动程序Driver，安装驱动管理器DriverManager
-            String driverName = properties.getProperty("jdbc.driver");
-            Class.forName(driverName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     // 增删改
-    private static void excute(String sql) {
+    public static void execute(String sql) {
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -86,13 +89,14 @@ public class DbUtils {
     }
 
     //查
-    private static List<HashMap<String, Object>> excuteQuery(String sql) {
+    public static List<LinkedHashMap<String, Object>> executeQuery(String sql) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet resultSet = null;
+
         try {
             // 保存所有记录的list集合
-            List<HashMap<String, Object>> allResultSet = new ArrayList<HashMap<String, Object>>();
+            List<LinkedHashMap<String, Object>> allResultSet = new ArrayList<LinkedHashMap<String, Object>>();
             // 2:建立连接
             conn = getConnection();
             // 4:创建陈述对象
@@ -106,7 +110,7 @@ public class DbUtils {
             // 1：结果可能没有，1条或者多条，每条有1个字段和多个字段
             while (resultSet.next()) {
                 // 数据库查询出来的每一条记录都是一个map
-                HashMap<String, Object> resultMap = new HashMap<String, Object>();
+                LinkedHashMap<String, Object> resultMap = new LinkedHashMap<String, Object>();
                 // 这一行有很多列表，现在要把列名作为key，对应记录的的列值作为map的值
                 // 动态获得记录的列数
                 // 循环所有列
@@ -162,10 +166,10 @@ public class DbUtils {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        List<HashMap<String, Object>> allResultSet = excuteQuery("select * from member");
-        for (HashMap<String, Object> hashMap : allResultSet) {
-            System.out.println(hashMap);
+    public static void main(String[] args) {
+        List<LinkedHashMap<String, Object>> LinkedHashMaps = executeQuery("select *  from loan t where t.id='15';");
+        for (LinkedHashMap<String, Object> LinkedHashMap : LinkedHashMaps) {
+            System.out.println(LinkedHashMap);
         }
     }
 

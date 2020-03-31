@@ -21,7 +21,8 @@ import java.util.List;
  */
 public class ExcelUtils {
 
-    /** 读取excel的方法
+    /**
+     * 读取excel的方法
      * @param excelPath  Excel相对路径
      * @param sheetIndex 表单索引
      * @param clazz      要读的类的字节码
@@ -80,6 +81,8 @@ public class ExcelUtils {
                     currentCell.setCellType(CellType.STRING);
                     // 得到当前列的值
                     String cellValue = currentCell.getStringCellValue();
+                    //先进行参数替换，再传给它自己
+                    cellValue = ParamUtils.getReplacedStr(cellValue);
                     // 获得当前数据列对应的属性名
                     String fieldName = fieldArray[j];
                     // 获取属性名对应的setter方法：
@@ -198,6 +201,57 @@ public class ExcelUtils {
         }
     }
 
+    /**
+     * @param sourceExcelPath 文件原路径
+     * @param targetExcelPath 文件写入路径
+     * @param sheetIndex      sheet表单所引
+     */
+    public static void batchWriteSqlCheck(String sourceExcelPath, String targetExcelPath, int sheetIndex) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        Workbook workbook = null;
+        try {
+            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
+            //获取全局数据池的所有实际结果(SQL验证数据)
+            List<WriteData> writeDataList = ApiUtils.getWriteSqlCheckInfoList();
+            for (WriteData writeData : writeDataList) {
+                Row row = sheet.getRow(writeData.getRowNo() - 1);//行号
+                Cell cell = row.getCell(writeData.getCellNo() - 1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);//列
+                cell.setCellType(CellType.STRING);
+                cell.setCellValue(writeData.getData());
+                outputStream = new FileOutputStream(new File(targetExcelPath));
+                workbook.write(outputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (workbook != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public static void main(String[] args) {
         ArrayList<Object> dataList = readExcel("/case/testCase04.xlsx", 1, ApiInfo.class);

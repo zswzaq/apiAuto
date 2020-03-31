@@ -236,6 +236,12 @@ public class HttpUtils {
     public static String action(ApiCaseDetail apiCaseDetail) {
         //请求方法
         String type = apiCaseDetail.getApiInfo().getType();
+        //需要对请求的数据替换，替换为提取的数据
+        String requestData = apiCaseDetail.getRequestData();
+        //替换
+        String replacedStr = ParamUtils.getReplacedStr(requestData);
+        //重新设值回去请求体中
+        apiCaseDetail.setRequestData(replacedStr);
         //请求分发
         String str = null;
         if (RequestType.GET.toString().equalsIgnoreCase(type)) {
