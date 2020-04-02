@@ -1,10 +1,10 @@
 package base.uitls;
 
-
 import base.pojo.ApiCaseDetail;
 import base.pojo.Header;
 import base.pojo.RequestType;
 import com.alibaba.fastjson.JSONObject;
+import com.lemon.EncryptUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -18,10 +18,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ZS
@@ -29,6 +33,8 @@ import java.util.*;
  * @date 2020/3/24 14:09
  */
 public class HttpUtils {
+    private static Logger log = Logger.getLogger(HttpUtils.class);
+
     /**
      * @Param: [url, map]
      * @return: java.lang.String
@@ -114,7 +120,9 @@ public class HttpUtils {
 
         //设置必须的请求头
         for (Header header : headerList) {
-            post.setHeader(header.getKey(), header.getValue());
+            //把登陆信息中的token提取出来，进行替换，再重新设值进去header里
+            String replacedStr = ParamUtils.getReplacedStr(header.getValue());
+            post.setHeader(header.getKey(), replacedStr);
         }
         StringEntity stringEntity = new StringEntity(apiCaseDetail.getRequestData(), ContentType.APPLICATION_JSON);
         stringEntity.setContentEncoding("utf-8");
@@ -145,7 +153,7 @@ public class HttpUtils {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost post = new HttpPost(url);
         //设置必须的请求头
-        post.setHeader("X-Lemonban-Media-Type", "lemonban.v1");
+        //post.setHeader("X-Lemonban-Media-Type", "lemonban.v1");
         StringEntity stringEntity = new StringEntity(requestData, ContentType.APPLICATION_JSON);
         stringEntity.setContentEncoding("utf-8");
         //设置请求体
@@ -233,15 +241,13 @@ public class HttpUtils {
         return null;
     }
 
+    //发包
     public static String action(ApiCaseDetail apiCaseDetail) {
+        log.info("开始发包请求");
         //请求方法
         String type = apiCaseDetail.getApiInfo().getType();
-        //需要对请求的数据替换，替换为提取的数据
-        String requestData = apiCaseDetail.getRequestData();
-        //替换
-        String replacedStr = ParamUtils.getReplacedStr(requestData);
-        //重新设值回去请求体中
-        apiCaseDetail.setRequestData(replacedStr);
+        //处理请求的数据，替换请求头、请求体
+        handleRequestData(apiCaseDetail);
         //请求分发
         String str = null;
         if (RequestType.GET.toString().equalsIgnoreCase(type)) {
@@ -253,6 +259,35 @@ public class HttpUtils {
             str = HttpUtils.doPatch(apiCaseDetail);
         }
         return str;
+    }
+
+    /**
+     * 处理请求的数据，替换请求头、请求体
+     * @param apiCaseDetail
+     */
+    private static void handleRequestData(ApiCaseDetail apiCaseDetail) {
+        //需要对请求的数据替换，替换为提取的数据
+        String requestData = apiCaseDetail.getRequestData();
+        //替换（member-id）
+        String replacedSRequestData = ParamUtils.getReplacedStr(requestData);
+        //-----获取鉴权的时间戳+token+sign----------
+        //首先判断哪些接口需求鉴权，如果不判断，全部鉴权的话，会找不到token报空指针
+        String auth = apiCaseDetail.getApiInfo().getAuth();
+        if (null != auth && "Y".equals(auth)) {
+            //从数据池中拿到对应的token
+            String token = ParamUtils.getGlobalData("token").toString();
+            long timestamp = System.currentTimeMillis() / 1000;//时间戳
+            String tempStr = token.substring(0, 50) + timestamp;//时间戳+token
+            String sign = EncryptUtils.rsaEncrypt(tempStr);//加密-->sign
+            //将上边首次替换后的请求头转成map
+            Map<String, Object> reqStrMap = (Map<String, Object>) JSONObject.parse(replacedSRequestData);
+            reqStrMap.put("timestamp", timestamp);//加时间戳
+            reqStrMap.put("sign", sign);//加签名
+            replacedSRequestData = JSONObject.toJSONString(reqStrMap);//map转为string类型，得到最后的请求体
+        }
+        //---------------
+        //重新设值回去请求体中
+        apiCaseDetail.setRequestData(replacedSRequestData);
     }
 
     public static String doPatch(ApiCaseDetail apiCaseDetail) {

@@ -4,6 +4,7 @@ import base.pojo.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import java.util.Map;
  * @date 2020/3/28 13:43
  */
 public class ApiUtils {
+    private static Logger log = Logger.getLogger(ApiUtils.class);
+
     //全局数据池存放写回的实际结果，提供get set方法
     private static List<WriteData> writeDataList = new ArrayList<WriteData>();
 

@@ -3,6 +3,7 @@ package base.test;
 import base.pojo.ApiCaseDetail;
 import base.pojo.WriteData;
 import base.uitls.*;
+import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.testng.annotations.AfterSuite;
@@ -20,18 +21,21 @@ import java.io.InputStream;
  * @date 2020/3/28 23:22
  */
 public class TestAllCase04 {
-
+    private  static Logger log = Logger.getLogger(TestAllCase04.class);
     @BeforeSuite
     public String beforeSuite() {
-        //数据初始化，得到随机的手机号
+        log.info("数据初始化");
+        //数据初始化，得到随机的手机号·
         String tel = RdPersonUtils.getTel();
         ParamUtils.addGlobalData("mobile_phone", tel);
         ParamUtils.addGlobalData("pwd", "12345678");
+        log.info("开始测试使用的手机号:"+tel);
         return tel;
     }
 
     @DataProvider
     public Object[][] getData() {
+        log.info("准备测试用例相关数据及接口信息等");
         return ApiUtils.getData();
     }
 
@@ -47,7 +51,7 @@ public class TestAllCase04 {
         //搜集实际结果，回写数据
         ApiUtils.setWriteDataList(writeData);
         //提取需要参数的数据
-        ApiUtils.tqRespData(apiCaseDetail,actualResult);
+        ApiUtils.tqRespData(apiCaseDetail, actualResult);
         //后置验证
         SqlCheckUtils.afterCheck(apiCaseDetail);
         //断言实际结果与预计结果

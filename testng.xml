@@ -14,7 +14,7 @@
 <suite name="All Test Suite">
 <test verbose="2" preserve-order="true" name="testCase">
     <classes>
-        <class name="base.test.TestAllCase"/>
+        <class name="base.test.TestAllCase04"/>
     </classes>
 </test>
 </suite>

@@ -16,15 +16,17 @@ public class ApiInfo extends ExcelBase {
     private String apiName;
     private String Type;
     private String headers;
+    private String auth;//是否需要鉴权
 
     @Override
     public String toString() {
-        return super.toString() + "ApiInfo{" +
+        return "ApiInfo{" +
                 "apiId='" + apiId + '\'' +
                 ", url='" + url + '\'' +
                 ", apiName='" + apiName + '\'' +
                 ", Type='" + Type + '\'' +
                 ", headers='" + headers + '\'' +
-                "} ";
+                ", auth='" + auth + '\'' +
+                "} " + super.toString();
     }
 }
