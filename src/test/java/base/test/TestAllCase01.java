@@ -4,7 +4,6 @@ import base.pojo.ApiCaseDemo;
 import base.uitls.ExcelUtils;
 import base.uitls.HttpUtils;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 
@@ -31,7 +30,7 @@ public class TestAllCase01 {
         return datas;
     }
 
-    @Test(dataProvider = "getData")
+    //@Test(dataProvider = "getData")
     public void test1(ApiCaseDemo apiCase) {
         String url = apiCase.getUrl();
         String requestData=apiCase.getRequestData();

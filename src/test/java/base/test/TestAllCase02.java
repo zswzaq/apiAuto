@@ -1,6 +1,5 @@
 package base.test;
 
-import base.pojo.ApiCaseDemo;
 import base.pojo.ApiCaseDetail;
 import base.pojo.ApiInfo;
 import base.uitls.ApiUtils;
@@ -8,11 +7,8 @@ import base.uitls.AssertUtils;
 import base.uitls.ExcelUtils;
 import base.uitls.HttpUtils;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author ZS
@@ -26,7 +22,7 @@ public class TestAllCase02 {
         return ApiUtils.getData();
     }
 
-    @Test(dataProvider = "getData")
+    //@Test(dataProvider = "getData")
     public void test0328(ApiCaseDetail apiCaseDetail) {
         //String str = HttpUtils.action(apiCaseDetail);
         //断言实际结果与预计结果
