@@ -87,6 +87,11 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+            </plugin>
             <!-- 指定jdk版本，防止jdk构建版本变动 解决每次右键项目名-maven->update project 时候，项目jdk版本变了，变回1.5版本或者其他版本
 				解决使用maven编译其他问题：如提示不能在内部类访问外部非final局部变量 -->
             <plugin>
