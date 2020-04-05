@@ -2,7 +2,6 @@ package base.uitls;
 
 import base.pojo.ApiInfo;
 import base.pojo.WriteData;
-import base.test.TestAllCase04;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
@@ -123,7 +122,7 @@ public class ExcelUtils {
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
         try {
-            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            inputStream = ExcelUtils.class.getResourceAsStream(sourceExcelPath);
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
             Row row = sheet.getRow(writeData.getRowNo() - 1);//行号
@@ -158,7 +157,7 @@ public class ExcelUtils {
         FileOutputStream outputStream = null;
         Workbook workbook = null;
         try {
-            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            inputStream = ExcelUtils.class.getResourceAsStream(sourceExcelPath);
             workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
             //获取全局数据池的所有实际结果
@@ -171,7 +170,6 @@ public class ExcelUtils {
                 outputStream = new FileOutputStream(new File(targetExcelPath));
                 workbook.write(outputStream);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InvalidFormatException e) {
@@ -202,6 +200,70 @@ public class ExcelUtils {
     }
 
     /**
+     * 批量回写数据池中的数据到文件中
+     * @param sourceExcelPath
+     * @param targetExcelPath
+     */
+    public static void batchWriteExcel(String sourceExcelPath, String targetExcelPath) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        Workbook workbook = null;
+        try {
+            inputStream = ExcelUtils.class.getResourceAsStream(sourceExcelPath);
+            workbook = WorkbookFactory.create(inputStream);
+            //-------回写第一个表单---------------
+            Sheet sheet0 = workbook.getSheetAt(0);//用例详情表单
+            //获取全局数据池的所有实际结果
+            List<WriteData> writeDataList = ApiUtils.getWriteDataList();
+            for (WriteData writeData : writeDataList) {
+                Row row = sheet0.getRow(writeData.getRowNo() - 1);//行号
+                Cell cell = row.getCell(writeData.getCellNo() - 1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);//列
+                cell.setCellType(CellType.STRING);
+                cell.setCellValue(writeData.getData());
+                outputStream = new FileOutputStream(new File(targetExcelPath));
+                workbook.write(outputStream);
+            }
+            //-------回写第三个表单---------------
+            Sheet sheet2 = workbook.getSheetAt(2);//用例详情表单
+            //获取全局数据池的所有实际结果
+            List<WriteData> writeSqlCheckInfoList = ApiUtils.getWriteSqlCheckInfoList();
+            for (WriteData writeData : writeSqlCheckInfoList) {
+                Row row = sheet2.getRow(writeData.getRowNo() - 1);//行号
+                Cell cell = row.getCell(writeData.getCellNo() - 1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);//列
+                cell.setCellType(CellType.STRING);
+                cell.setCellValue(writeData.getData());
+                outputStream = new FileOutputStream(new File(targetExcelPath));
+                workbook.write(outputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (workbook != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    /**
      * @param sourceExcelPath 文件原路径
      * @param targetExcelPath 文件写入路径
      * @param sheetIndex      sheet表单所引
@@ -211,7 +273,7 @@ public class ExcelUtils {
         FileOutputStream outputStream = null;
         Workbook workbook = null;
         try {
-            inputStream = TestAllCase04.class.getResourceAsStream(sourceExcelPath);
+            inputStream = ExcelUtils.class.getResourceAsStream(sourceExcelPath);
             workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(sheetIndex);//用例详情表单
             //获取全局数据池的所有实际结果(SQL验证数据)

@@ -47,7 +47,7 @@ public class TestAllCase04 {
         String actualResult = HttpUtils.action(apiCaseDetail);
 
         //实际结果数据
-        WriteData writeData = new WriteData(apiCaseDetail.getRowNo(), 5, actualResult);
+        WriteData writeData = new WriteData(apiCaseDetail.getRowNo(), 6, actualResult);
         //搜集实际结果，回写数据
         ApiUtils.setWriteDataList(writeData);
         //提取需要参数的数据
@@ -97,8 +97,11 @@ public class TestAllCase04 {
     //执行完所有用例后，再写入所有的实际结果的数据
     @AfterSuite
     public void afterSuite() {
-        ExcelUtils.batchWriteExcel("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 0);
-        ExcelUtils.batchWriteSqlCheck("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 2);
+        //批量一起回写
+        ExcelUtils.batchWriteExcel("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx");
+        //分开写，会造成只保留第三个表单的数据
+        //ExcelUtils.batchWriteExcel("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 0);
+        //ExcelUtils.batchWriteSqlCheck("/case/testCase04.xlsx", "D:\\testStudy\\test.xlsx", 2);
 
     }
 

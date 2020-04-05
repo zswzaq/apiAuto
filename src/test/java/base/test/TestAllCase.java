@@ -3,15 +3,9 @@ package base.test;
 import base.pojo.RegisterData;
 import base.uitls.ExcelUtils;
 import base.uitls.HttpUtils;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -71,7 +65,7 @@ public class TestAllCase {
         //        };
     }
 
-    @Test(dataProvider = "getData")
+    //@Test(dataProvider = "getData")
     public void test1(RegisterData registerData) {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("mobliephone", registerData.getPhone());
